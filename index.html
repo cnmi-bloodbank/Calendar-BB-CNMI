@@ -531,16 +531,6 @@
     min-height: 118px;
   }
 }
-
-@media (max-width: 768px) {
-  .calendar-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .day-card {
-    min-height: auto;
-  }
-}
     
   @media (max-width: 900px) {
     .login-page {
@@ -601,6 +591,38 @@
       display: inline-flex;
     }
   }
+
+@media (max-width: 768px) {
+  .calendar-wrap {
+    overflow-x: auto;
+  }
+
+  .calendar-weekdays,
+  .calendar-grid {
+    grid-template-columns: repeat(7, 118px);
+    min-width: 826px;
+  }
+
+  .weekday-cell {
+    font-size: 0;
+  }
+
+  .weekday-cell::after {
+    content: attr(data-short);
+    font-size: 14px;
+  }
+
+  .day-card {
+    min-height: 118px;
+  }
+
+  .event-pill {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+    
 </style>
   
 </head>
@@ -678,13 +700,13 @@
 
         <div class="calendar-wrap">
           <div class="calendar-weekdays">
-            <div class="weekday-cell">อา</div>
-            <div class="weekday-cell">จ</div>
-            <div class="weekday-cell">อ</div>
-            <div class="weekday-cell">พ</div>
-            <div class="weekday-cell">พฤ</div>
-            <div class="weekday-cell">ศ</div>
-            <div class="weekday-cell">ส</div>
+            <div class="weekday-cell" data-short="อา">อาทิตย์</div>
+            <div class="weekday-cell" data-short="จ">จันทร์</div>
+            <div class="weekday-cell" data-short="อ">อังคาร</div>
+            <div class="weekday-cell" data-short="พ">พุธ</div>
+            <div class="weekday-cell" data-short="พฤ">พฤหัสบดี</div>
+            <div class="weekday-cell" data-short="ศ">ศุกร์</div>
+            <div class="weekday-cell" data-short="ส">เสาร์</div>
           </div>
 
           <div id="calendarGrid" class="calendar-grid"></div>
@@ -912,24 +934,184 @@ function renderCalendar(data) {
   const title = document.getElementById("calendarTitle");
   const grid = document.getElementById("calendarGrid");
 
-  title.textContent = `Dashboard ${String(data.month).padStart(2, "0")}/${data.year}`;
+  title.textContent =
+    `${getThaiMonthName(data.month)} ${data.year}`;
+
   grid.innerHTML = "";
+
+  const firstDate = new Date(data.year, data.month - 1, 1);
+  const firstDay = firstDate.getDay();
+
+  for (let i = 0; i < firstDay; i++) {
+    const blank = document.createElement("div");
+    blank.className = "day-card other-month empty-mobile";
+    grid.appendChild(blank);
+  }
 
   data.days.forEach(day => {
     const card = document.createElement("div");
-    card.className = "day-card";
+    const events = buildDayEvents(day);
 
-    card.innerHTML = `
+    card.className = "day-card";
+    card.onclick = () => openDayDetail(day, events);
+
+    if (isToday(day.date)) {
+      card.classList.add("today");
+    }
+
+    let html = `
       <div class="day-number">${day.day}</div>
-      ${day.holidays.length ? `<span class="day-chip chip-holiday">วันหยุด ${day.holidays.length}</span>` : ""}
-      ${day.blockedDates.length ? `<span class="day-chip chip-blocked">ห้ามเซต</span>` : ""}
-      ${day.requests.filter(r => r.requestType === "LEAVE").length ? `<span class="day-chip chip-leave">ลา ${day.requests.filter(r => r.requestType === "LEAVE").length}</span>` : ""}
-      ${day.requests.filter(r => r.requestType === "NO_DUTY").length ? `<span class="day-chip chip-duty">ไม่รับเวร ${day.requests.filter(r => r.requestType === "NO_DUTY").length}</span>` : ""}
-      ${day.meetings.length ? `<span class="day-chip chip-meeting">ประชุม ${day.meetings.length}</span>` : ""}
     `;
 
+    events.slice(0, 4).forEach(ev => {
+      html += `
+        <span class="event-pill ${ev.className}">
+          ${ev.label}
+        </span>
+      `;
+    });
+
+    if (events.length > 4) {
+      html += `
+        <span class="more-pill">
+          อีก ${events.length - 4} รายการ
+        </span>
+      `;
+    }
+
+    card.innerHTML = html;
     grid.appendChild(card);
   });
+}
+
+function buildDayEvents(day) {
+  const events = [];
+
+  day.holidays.forEach(h => {
+    events.push({
+      type: "HOLIDAY",
+      label: h.holidayName,
+      className: "event-holiday",
+      detail: h.holidayName
+    });
+  });
+
+  day.blockedDates.forEach(b => {
+    events.push({
+      type: "BLOCKED",
+      label: "ห้ามเซต: " + b.title,
+      className: "event-blocked",
+      detail: b.reason || b.title
+    });
+  });
+
+  day.requests.forEach(r => {
+    if (r.requestType === "LEAVE") {
+      events.push({
+        type: "LEAVE",
+        label: `${getLeaveTypeLabelClient(r.leaveType)}: ${r.fullName}`,
+        className: "event-leave",
+        detail: `${r.startTime}-${r.endTime} | ${r.reason || "-"}`
+      });
+    }
+
+    if (r.requestType === "NO_DUTY") {
+      events.push({
+        type: "NO_DUTY",
+        label: `ไม่รับเวร: ${r.fullName}`,
+        className: "event-duty",
+        detail: r.reason || "-"
+      });
+    }
+
+    if (r.requestType === "OTHER") {
+      events.push({
+        type: "OTHER",
+        label: r.detail || "กิจกรรม",
+        className: "event-other",
+        detail: `${r.startTime}-${r.endTime} | ${r.location || "-"}`
+      });
+    }
+  });
+
+  day.meetings.forEach(m => {
+    events.push({
+      type: "MEETING",
+      label: m.detail || "ประชุม",
+      className: "event-meeting",
+      detail: `${m.startTime}-${m.endTime} | ${m.location || "-"}`
+    });
+  });
+
+  return events;
+}
+
+function openDayDetail(day, events) {
+  if (!events.length) {
+    showModal(
+      formatDateThaiClient(day.date),
+      "วันนี้ยังไม่มีรายการ",
+      "📅"
+    );
+    return;
+  }
+
+  const text = events.map(ev => {
+    return `• ${ev.label}\n  ${ev.detail}`;
+  }).join("\n\n");
+
+  showModal(
+    formatDateThaiClient(day.date),
+    text,
+    "📅"
+  );
+}
+
+function isToday(ymd) {
+  const today = new Date();
+  const todayYmd =
+    today.getFullYear() + "-" +
+    String(today.getMonth() + 1).padStart(2, "0") + "-" +
+    String(today.getDate()).padStart(2, "0");
+
+  return ymd === todayYmd;
+}
+
+function getThaiMonthName(month) {
+  const names = [
+    "",
+    "มกราคม",
+    "กุมภาพันธ์",
+    "มีนาคม",
+    "เมษายน",
+    "พฤษภาคม",
+    "มิถุนายน",
+    "กรกฎาคม",
+    "สิงหาคม",
+    "กันยายน",
+    "ตุลาคม",
+    "พฤศจิกายน",
+    "ธันวาคม"
+  ];
+
+  return names[month] || "";
+}
+
+function formatDateThaiClient(ymd) {
+  const [y, m, d] = ymd.split("-");
+  return `${Number(d)} ${getThaiMonthName(Number(m))} ${y}`;
+}
+
+function getLeaveTypeLabelClient(type) {
+  const map = {
+    SICK: "ลาป่วย",
+    PERSONAL: "ลากิจ",
+    VACATION: "ลาพักผ่อน",
+    MATERNITY: "ลาคลอด",
+    UNPAID_MATERNITY: "ลาคลอดเพิ่ม"
+  };
+
+  return map[type] || type;
 }
     
   </script>
