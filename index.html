@@ -677,16 +677,16 @@
   }
 
   .calendar-wrap {
-    overflow-x: auto;
-    border-radius: 18px;
-    -webkit-overflow-scrolling: touch;
-  }
+  overflow-x: hidden;
+  border-radius: 18px;
+}
 
-  .calendar-weekdays,
-  .calendar-grid {
-    grid-template-columns: repeat(7, 72px);
-    min-width: 504px;
-  }
+.calendar-weekdays,
+.calendar-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  min-width: 0;
+  width: 100%;
+}
 
   .weekday-cell {
     padding: 8px 4px;
@@ -700,9 +700,9 @@
   }
 
   .day-card {
-    min-height: 92px;
-    padding: 6px;
-  }
+  min-height: 86px;
+  padding: 5px;
+}
 
   .day-number {
     width: 22px;
@@ -712,15 +712,15 @@
   }
 
   .event-pill {
-    margin-top: 3px;
-    padding: 3px 5px;
-    border-radius: 6px;
-    font-size: 10px;
-    line-height: 1.15;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  margin-top: 3px;
+  padding: 3px 4px;
+  border-radius: 6px;
+  font-size: 9px;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
   .more-pill {
     font-size: 10px;
