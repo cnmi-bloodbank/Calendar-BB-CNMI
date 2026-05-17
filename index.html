@@ -438,6 +438,52 @@
   min-width: 840px;
 }
 
+ .calendar-toolbar {
+  display: grid;
+  grid-template-columns: 120px 1fr 120px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.calendar-title {
+  margin: 0;
+  text-align: center;
+  color: var(--text);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.calendar-nav-btn {
+  border: 0;
+  border-radius: 12px;
+  background: #eef0ff;
+  color: var(--primary);
+  padding: 9px 12px;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.calendar-nav-btn:hover {
+  background: #e4e8ff;
+}
+
+@media (max-width: 768px) {
+  .calendar-toolbar {
+    grid-template-columns: 92px 1fr 92px;
+    gap: 8px;
+  }
+
+  .calendar-title {
+    font-size: 22px;
+  }
+
+  .calendar-nav-btn {
+    padding: 9px 8px;
+    font-size: 13px;
+  }
+}
+
 .day-card {
   min-height: 132px;
   padding: 8px;
@@ -489,29 +535,44 @@
   text-overflow: ellipsis;
 }
 
-.event-leave {
-  background: #dfe5ff;
-  color: #4057c8;
+.event-sick {
+  background: #ffd56a;
+  color: #4a3500;
 }
 
-.event-duty {
-  background: #dff1ff;
-  color: #256c9c;
+.event-vacation {
+  background: #8fdca3;
+  color: #164b28;
+}
+
+.event-personal {
+  background: #b88cf6;
+  color: #32105f;
 }
 
 .event-meeting {
-  background: #e5f6ec;
-  color: #24724b;
+  background: #ff8f8f;
+  color: #5c0909;
+}
+
+.event-maternity {
+  background: #74b9ff;
+  color: #073b66;
+}
+
+.event-duty {
+  background: #8b95a1;
+  color: white;
 }
 
 .event-blocked {
-  background: #ffe5e5;
-  color: #b94040;
+  background: #f0b429;
+  color: #2f2600;
 }
 
 .event-holiday {
-  background: #fff0c2;
-  color: #8a6818;
+  background: #111827;
+  color: white;
 }
 
 .more-pill {
@@ -692,10 +753,10 @@
       </div>
 
       <div class="card-soft">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <button class="btn-soft" onclick="changeMonth(-1)">‹ เดือนก่อน</button>
-          <h5 id="calendarTitle" class="fw-bold mb-0">เดือน</h5>
-          <button class="btn-soft" onclick="changeMonth(1)">เดือนถัดไป ›</button>
+        <div class="calendar-toolbar">
+          <button class="calendar-nav-btn" onclick="changeMonth(-1)">‹ เดือนก่อน</button>
+          <h5 id="calendarTitle" class="calendar-title">พฤษภาคม 2026</h5>
+          <button class="calendar-nav-btn" onclick="changeMonth(1)">เดือนถัดไป ›</button>
         </div>
 
         <div class="calendar-wrap">
@@ -934,8 +995,7 @@ function renderCalendar(data) {
   const title = document.getElementById("calendarTitle");
   const grid = document.getElementById("calendarGrid");
 
-  title.textContent =
-    `${getThaiMonthName(data.month)} ${data.year}`;
+  title.textContent = `${getThaiMonthName(data.month)} ${data.year}`;
 
   grid.innerHTML = "";
 
@@ -1010,7 +1070,7 @@ function buildDayEvents(day) {
       events.push({
         type: "LEAVE",
         label: `${getLeaveTypeLabelClient(r.leaveType)}: ${r.fullName}`,
-        className: "event-leave",
+        className: getLeaveEventClass(r.leaveType),
         detail: `${r.startTime}-${r.endTime} | ${r.reason || "-"}`
       });
     }
@@ -1112,6 +1172,18 @@ function getLeaveTypeLabelClient(type) {
   };
 
   return map[type] || type;
+}
+
+  function getLeaveEventClass(type) {
+  const leaveType = String(type || "").toUpperCase();
+
+  if (leaveType === "SICK") return "event-sick";
+  if (leaveType === "VACATION") return "event-vacation";
+  if (leaveType === "PERSONAL") return "event-personal";
+  if (leaveType === "MATERNITY") return "event-maternity";
+  if (leaveType === "UNPAID_MATERNITY") return "event-maternity";
+
+  return "event-duty";
 }
     
   </script>
