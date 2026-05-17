@@ -785,6 +785,54 @@
   font-weight: 900;
   margin-bottom: 12px;
 }
+
+.request-header {
+  margin-bottom: 22px;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.request-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.btn-submit-request {
+  width: 100%;
+  border: 0;
+  border-radius: 18px;
+  padding: 14px;
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    var(--accent)
+  );
+  color: white;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+@media (max-width: 768px) {
+  .request-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .request-header {
+    font-size: 24px;
+  }
+}
     
 </style>
   
@@ -838,7 +886,7 @@
       <div class="brand">CNMI Staff BB Calendar</div>
 
       <button class="nav-btn active">📅 Dashboard</button>
-      <button class="nav-btn">📝 บันทึกรายการ</button>
+      <button class="nav-btn" onclick="showRequestPage()"> 📝 บันทึกรายการ </button>
       <button class="nav-btn">📌 รายการของฉัน</button>
       <button class="nav-btn">🏥 ยืนยัน HR</button>
       <button class="nav-btn">⚙️ Admin</button>
@@ -1348,6 +1396,72 @@ function getLeaveTypeLabelClient(type) {
     }
   });
 });
+
+    function showRequestPage() {
+  document.getElementById("dashboardPage").style.display = "none";
+
+  const page = document.getElementById("requestPage");
+  page.style.display = "block";
+
+  page.innerHTML = `
+    <div class="card-soft">
+      <div class="request-header">
+        📝 บันทึกรายการ
+      </div>
+
+      <div class="request-grid">
+
+        <div class="form-group">
+          <label>ประเภท</label>
+          <select class="form-select" id="requestType">
+            <option value="">เลือกประเภท</option>
+            <option>ลาป่วย</option>
+            <option>ลาพักผ่อน</option>
+            <option>ลากิจ</option>
+            <option>ลาคลอด</option>
+            <option>ประชุม</option>
+            <option>ห้ามเซต</option>
+            <option>ไม่รับเวร</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>วันที่เริ่ม</label>
+          <input type="date" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label>วันที่สิ้นสุด</label>
+          <input type="date" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label>เวลาเริ่ม</label>
+          <input type="time" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label>เวลาสิ้นสุด</label>
+          <input type="time" class="form-control">
+        </div>
+
+        <div class="form-group full-width">
+          <label>รายละเอียด</label>
+          <textarea class="form-control"
+            rows="4"
+            placeholder="รายละเอียดเพิ่มเติม"></textarea>
+        </div>
+
+        <div class="full-width">
+          <button class="btn-submit-request">
+            บันทึกรายการ
+          </button>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
     
   </script>
 
