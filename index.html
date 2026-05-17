@@ -566,8 +566,8 @@
 }
 
 .event-blocked {
-  background: #f0b429;
-  color: #2f2600;
+  background: #374151;
+  color: #ffffff;
 }
 
 .event-holiday {
@@ -682,6 +682,55 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+.detail-item-btn {
+  width: 100%;
+  display: block;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #f8faff;
+  text-align: left;
+}
+
+.detail-item-title {
+  color: var(--text);
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.detail-item-sub {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.event-detail-card {
+  padding: 14px;
+  border-radius: 18px;
+  background: #f8faff;
+  border: 1px solid var(--line);
+}
+
+.event-detail-type {
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.event-detail-title {
+  color: var(--text);
+  font-weight: 900;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.event-detail-line {
+  color: var(--muted);
+  line-height: 1.7;
 }
     
 </style>
@@ -1116,15 +1165,43 @@ function openDayDetail(day, events) {
     return;
   }
 
-  const text = events.map(ev => {
-    return `• ${ev.label}\n  ${ev.detail}`;
-  }).join("\n\n");
+  const listHtml = events.map((ev, index) => {
+    return `
+      <button class="detail-item-btn" onclick="openEventDetail(${index})">
+        <div class="detail-item-title">${ev.label}</div>
+        <div class="detail-item-sub">${ev.detail}</div>
+      </button>
+    `;
+  }).join("");
 
-  showModal(
+  window.currentDayEvents = events;
+
+  showModalHtml(
     formatDateThaiClient(day.date),
-    text,
+    listHtml,
     "📅"
   );
+}
+
+function openEventDetail(index) {
+  const ev = window.currentDayEvents[index];
+
+  const html = `
+    <div class="event-detail-card">
+      <div class="event-detail-type">${ev.type}</div>
+      <div class="event-detail-title">${ev.label}</div>
+      <div class="event-detail-line">${ev.detail}</div>
+    </div>
+  `;
+
+  showModalHtml("รายละเอียดรายการ", html, "📌");
+}
+
+function showModalHtml(title, html, icon = "✨") {
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalText").innerHTML = html;
+  document.getElementById("modalIcon").textContent = icon;
+  document.getElementById("messageModal").classList.add("show");
 }
 
 function isToday(ymd) {
