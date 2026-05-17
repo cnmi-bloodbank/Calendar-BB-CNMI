@@ -30,22 +30,282 @@
     }
 
     .login-page {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: linear-gradient(135deg, #e9f8ff, #f8fdff);
-    }
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  align-items: center;
+  gap: 56px;
+  padding: 48px 8vw;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 8% 85%, rgba(255, 111, 207, 0.35), transparent 28%),
+    radial-gradient(circle at 88% 6%, rgba(144, 94, 255, 0.36), transparent 30%),
+    radial-gradient(circle at 78% 82%, rgba(94, 143, 255, 0.22), transparent 34%),
+    linear-gradient(135deg, #f9f7ff 0%, #eef4ff 45%, #fff8fd 100%);
+  position: relative;
+}
 
-    .login-card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--card);
-      border-radius: 28px;
-      padding: 28px;
-      box-shadow: 0 20px 60px rgba(37, 109, 133, 0.15);
-    }
+.login-page::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  left: -130px;
+  bottom: -130px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 105, 203, 0.42), rgba(123, 92, 255, 0.18));
+  filter: blur(2px);
+}
+
+.login-page::after {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: -110px;
+  top: -120px;
+  border-radius: 44%;
+  background: linear-gradient(135deg, rgba(122, 92, 255, 0.45), rgba(255, 107, 203, 0.18));
+  filter: blur(1px);
+}
+
+.login-hero {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+}
+
+.hero-icon {
+  width: 82px;
+  height: 82px;
+  border-radius: 28px;
+  display: grid;
+  place-items: center;
+  font-size: 42px;
+  background: rgba(255,255,255,.75);
+  box-shadow: 0 20px 45px rgba(113, 88, 255, .16);
+  margin-bottom: 24px;
+}
+
+.login-hero h1 {
+  font-size: clamp(42px, 5vw, 68px);
+  line-height: 1.05;
+  font-weight: 900;
+  color: #17214f;
+  margin: 0 0 14px;
+  letter-spacing: -1px;
+}
+
+.login-hero h1 span {
+  background: linear-gradient(90deg, #6d5dfc, #ff5fc8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-hero p {
+  font-size: 24px;
+  color: #4d557a;
+  margin: 0 0 18px;
+  font-weight: 700;
+}
+
+.hero-sub {
+  font-size: 17px;
+  color: #747b9a;
+  line-height: 1.8;
+}
+
+.hero-blob {
+  margin-top: 42px;
+  width: min(420px, 82vw);
+  height: 180px;
+  border-radius: 42px;
+  background:
+    radial-gradient(circle at 30% 35%, rgba(255,255,255,.9), transparent 18%),
+    linear-gradient(135deg, rgba(125, 104, 255, .28), rgba(255, 99, 202, .2));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), 0 25px 60px rgba(96, 91, 255, .15);
+  position: relative;
+}
+
+.hero-blob::before {
+  content: "📅";
+  position: absolute;
+  left: 42px;
+  top: 38px;
+  font-size: 76px;
+}
+
+.hero-blob::after {
+  content: "✓";
+  position: absolute;
+  right: 58px;
+  top: 48px;
+  width: 70px;
+  height: 70px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 44px;
+  font-weight: 900;
+  color: white;
+  background: linear-gradient(135deg, #7b61ff, #ff62c7);
+  box-shadow: 0 16px 35px rgba(255, 98, 199, .24);
+}
+
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: 34px;
+  padding: 38px;
+  box-shadow: 0 28px 80px rgba(64, 70, 140, 0.18);
+}
+
+.lock-badge {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  color: white;
+  background: linear-gradient(135deg, #6d5dfc, #ff5fc8);
+  box-shadow: 0 16px 35px rgba(118, 93, 252, .28);
+}
+
+.login-title {
+  text-align: center;
+  font-size: 38px;
+  font-weight: 900;
+  color: #17214f;
+  margin-bottom: 6px;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: #8a8fa6;
+  font-weight: 700;
+  margin-bottom: 28px;
+}
+
+.login-card .form-label {
+  color: #17214f;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.login-card .form-control {
+  height: 54px;
+  border-radius: 16px;
+  border: 1px solid #dfe3ee;
+  background: rgba(255,255,255,.82);
+  font-size: 17px;
+  padding-left: 18px;
+}
+
+.login-card .form-control:focus {
+  border-color: #8b6cff;
+  box-shadow: 0 0 0 4px rgba(139, 108, 255, .14);
+}
+
+.password-row {
+  position: relative;
+}
+
+.password-row .form-control {
+  padding-right: 52px;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 38px;
+  border: 0;
+  background: transparent;
+  color: #8a8fa6;
+  font-size: 20px;
+}
+
+.forgot-link {
+  display: block;
+  text-align: right;
+  margin-top: -8px;
+  margin-bottom: 22px;
+  color: #5c6dff;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.forgot-link:hover {
+  color: #ff5fc8;
+}
+
+.btn-main {
+  background: linear-gradient(90deg, #6d5dfc, #ff5fc8);
+  color: white;
+  border: 0;
+  border-radius: 16px;
+  padding: 13px 18px;
+  font-weight: 900;
+  font-size: 18px;
+  box-shadow: 0 18px 34px rgba(255, 95, 200, .22);
+}
+
+.btn-main:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+
+.login-footer {
+  text-align: center;
+  color: #9a9fb2;
+  font-size: 14px;
+  margin-top: 26px;
+}
+
+@media (max-width: 900px) {
+  .login-page {
+    grid-template-columns: 1fr;
+    padding: 28px 18px;
+    gap: 24px;
+  }
+
+  .login-hero {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .hero-icon,
+  .hero-blob {
+    display: none;
+  }
+
+  .login-hero h1 {
+    font-size: 42px;
+  }
+
+  .login-hero p {
+    font-size: 20px;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+  }
+
+  .login-card {
+    padding: 28px 22px;
+    border-radius: 28px;
+  }
+
+  .login-title {
+    font-size: 32px;
+  }
+}
 
     .app-shell {
       display: none;
@@ -144,19 +404,40 @@
 <body>
 
   <section id="loginPage" class="login-page">
-    <div class="login-card">
-      <h3 class="fw-bold mb-1">ระบบลา / ไม่รับเวร / ประชุม</h3>
-      <p class="text-muted mb-4">หน่วยเวชศาสตร์บริการโลหิต</p>
-
-      <label class="form-label">รหัสเจ้าหน้าที่</label>
-      <input id="loginUsername" class="form-control mb-3" placeholder="เช่น 012345">
-
-      <label class="form-label">รหัสผ่าน</label>
-      <input id="loginPassword" type="password" class="form-control mb-4" placeholder="รหัสผ่าน">
-
-      <button class="btn-main w-100" onclick="login()">เข้าสู่ระบบ</button>
+  <div class="login-hero">
+    <div class="hero-icon">🗓️</div>
+    <h1>Leave <span>Duty</span> System</h1>
+    <p>ระบบลา / ไม่รับเวร / ประชุม</p>
+    <div class="hero-sub">
+      ใช้งานง่าย สะดวก รวดเร็ว<br>
+      สำหรับบุคลากรโรงพยาบาล
     </div>
-  </section>
+    <div class="hero-blob"></div>
+  </div>
+
+  <div class="login-card">
+    <div class="lock-badge">🔒</div>
+    <div class="login-title">เข้าสู่ระบบ</div>
+    <div class="login-subtitle">กรุณาเข้าสู่ระบบเพื่อใช้งานระบบ</div>
+
+    <label class="form-label">รหัสเจ้าหน้าที่</label>
+    <input id="loginUsername" class="form-control mb-3" placeholder="เช่น 020305">
+
+    <div class="password-row">
+      <label class="form-label">รหัสผ่าน</label>
+      <input id="loginPassword" type="password" class="form-control mb-3" placeholder="รหัสผ่าน">
+      <button class="eye-btn" type="button" onclick="togglePassword()">👁</button>
+    </div>
+
+    <a class="forgot-link" onclick="forgotPassword()">ลืมรหัสผ่าน?</a>
+
+    <button class="btn-main w-100" onclick="login()">เข้าสู่ระบบ</button>
+
+    <div class="login-footer">
+      CNMI Blood Bank • Leave Duty System
+    </div>
+  </div>
+</section>
 
   <section id="appShell" class="app-shell">
     <aside id="sidebar" class="sidebar">
@@ -211,6 +492,16 @@
       localStorage.removeItem("leaveUser");
       location.reload();
     }
+    
+    function togglePassword() {
+  const input = document.getElementById("loginPassword");
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+function forgotPassword() {
+  alert("ขั้นต่อไปจะทำระบบส่งรหัสรีเซ็ตไปที่อีเมลในระบบ");
+}
+    
   </script>
 
 </body>
