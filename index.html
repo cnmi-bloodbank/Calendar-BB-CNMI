@@ -732,6 +732,16 @@
   color: var(--muted);
   line-height: 1.7;
 }
+
+.back-btn {
+  border: 0;
+  background: #eef0ff;
+  color: var(--primary);
+  border-radius: 14px;
+  padding: 9px 12px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
     
 </style>
   
@@ -1174,6 +1184,7 @@ function openDayDetail(day, events) {
     `;
   }).join("");
 
+  window.currentDayTitle = formatDateThaiClient(day.date);
   window.currentDayEvents = events;
 
   showModalHtml(
@@ -1187,6 +1198,10 @@ function openEventDetail(index) {
   const ev = window.currentDayEvents[index];
 
   const html = `
+    <button class="back-btn" onclick="backToDayList()">
+      ‹ กลับไปรายการทั้งหมด
+    </button>
+
     <div class="event-detail-card">
       <div class="event-detail-type">${ev.type}</div>
       <div class="event-detail-title">${ev.label}</div>
@@ -1195,6 +1210,25 @@ function openEventDetail(index) {
   `;
 
   showModalHtml("รายละเอียดรายการ", html, "📌");
+}
+
+function backToDayList() {
+  const events = window.currentDayEvents || [];
+
+  const listHtml = events.map((ev, index) => {
+    return `
+      <button class="detail-item-btn" onclick="openEventDetail(${index})">
+        <div class="detail-item-title">${ev.label}</div>
+        <div class="detail-item-sub">${ev.detail}</div>
+      </button>
+    `;
+  }).join("");
+
+  showModalHtml(
+    window.currentDayTitle || "รายการทั้งหมด",
+    listHtml,
+    "📅"
+  );
 }
 
 function showModalHtml(title, html, icon = "✨") {
@@ -1262,6 +1296,16 @@ function getLeaveTypeLabelClient(type) {
 
   return "event-duty";
 }
+
+    document.addEventListener("keydown", function (event) {
+  const loginVisible =
+    document.getElementById("loginPage").style.display !== "none";
+
+  if (loginVisible && event.key === "Enter") {
+    event.preventDefault();
+    login();
+  }
+});
     
   </script>
 
