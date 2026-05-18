@@ -1223,7 +1223,7 @@ function buildDayEvents(day) {
     if (r.requestType === "LEAVE") {
       events.push({
         type: "LEAVE",
-        label: `${getLeaveTypeLabelClient(r.leaveType)}: ${r.fullName}`,
+        label: `${getLeaveTypeLabelClient(r.leaveType)}: ${getDisplayName(r)}`,
         className: getLeaveEventClass(r.leaveType),
         detail: `${r.startTime}-${r.endTime} | ${r.reason || "-"}`
       });
@@ -1232,7 +1232,7 @@ function buildDayEvents(day) {
     if (r.requestType === "NO_DUTY") {
       events.push({
         type: "NO_DUTY",
-        label: `ไม่รับเวร: ${r.fullName}`,
+        label: `ไม่รับเวร: ${getDisplayName(r)}`,
         className: "event-duty",
         detail: r.reason || "-"
       });
@@ -1578,6 +1578,10 @@ async function submitRequestFromForm() {
 function showDashboardPage() {
   document.getElementById("requestPage").style.display = "none";
   document.getElementById("dashboardPage").style.display = "block";
+}
+
+function getDisplayName(person) {
+  return person.nickname || person.fullName || "-";
 }
     
   </script>
