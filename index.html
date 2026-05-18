@@ -898,6 +898,95 @@
     width: 100%;
   }
 }
+
+.my-request-list {
+  display: grid;
+  gap: 12px;
+}
+
+.my-request-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #f8faff;
+}
+
+.my-request-title {
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.my-request-sub,
+.my-request-reason {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.my-request-status {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.status-approved {
+  background: #e5f6ec;
+  color: #24724b;
+}
+
+.status-cancelled {
+  background: #ffe5e5;
+  color: #b94040;
+}
+
+.my-request-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 130px;
+}
+
+.my-detail-btn,
+.my-cancel-btn,
+.my-cancel-confirm-btn {
+  border: 0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-weight: 900;
+}
+
+.my-detail-btn {
+  background: #eef0ff;
+  color: var(--primary);
+}
+
+.my-cancel-btn,
+.my-cancel-confirm-btn {
+  background: #ffe5e5;
+  color: #b94040;
+}
+
+.my-cancel-confirm-btn {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .my-request-card {
+    flex-direction: column;
+  }
+
+  .my-request-actions {
+    width: 100%;
+  }
+}
     
 </style>
   
@@ -952,7 +1041,7 @@
 
       <button class="nav-btn active" onclick="showDashboardPage()">📅 ตารางประจำเดือน</button>
       <button class="nav-btn" onclick="showRequestPage()"> 📝 บันทึกรายการ </button>
-      <button class="nav-btn">📌 รายการของฉัน</button>
+      <button class="nav-btn" onclick="showMyRequestsPage()">📌 รายการของฉัน</button>
       <button class="nav-btn" onclick="showHrConfirmPage()"> ✅ ยืนยันลาใน HR-iService </button>
       <button class="nav-btn">⚙️ Admin (การตั้งค่า)</button>
       <button class="nav-btn" onclick="logout()">🚪 ออกจากระบบ</button>
@@ -992,7 +1081,8 @@
   </div>
 
   <div id="requestPage" style="display:none;"></div>
-<div id="hrConfirmPage" style="display:none;"></div>
+  <div id="hrConfirmPage" style="display:none;"></div>
+  <div id="myRequestsPage" style="display:none;"></div>
 </main>
   </section>
 
@@ -1734,6 +1824,171 @@ function hideAllPages() {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("requestPage").style.display = "none";
   document.getElementById("hrConfirmPage").style.display = "none";
+  document.getElementById("myRequestsPage").style.display = "none";
+}
+
+async function showMyRequestsPage() {
+  hideAllPages();
+
+  const page = document.getElementById("myRequestsPage");
+  page.style.display = "block";
+
+  page.innerHTML = `
+    <div class="card-soft">
+      <div class="request-header">📌 รายการของฉัน</div>
+      <div id="myRequestsList" class="my-request-list">
+        กำลังโหลด...
+      </div>
+    </div>
+  `;
+
+  const url =
+    `${WEB_APP_URL}?action=getMyRequests` +
+    `&userId=${encodeURIComponent(currentUser.userId)}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (!data.ok) {
+    showModal("โหลดข้อมูลไม่สำเร็จ", data.message || "กรุณาลองใหม่", "⚠️");
+    return;
+  }
+
+  renderMyRequests(data.requests || []);
+}
+
+function renderMyRequests(requests) {
+  const box = document.getElementById("myRequestsList");
+
+  if (!requests.length) {
+    box.innerHTML = `
+      <div class="empty-state">
+        ยังไม่มีรายการของฉัน
+      </div>
+    `;
+    return;
+  }
+
+  box.innerHTML = requests.map(r => {
+    const title = getRequestTitleClient(r);
+    const dateText = r.startDate === r.endDate
+      ? r.startDate
+      : `${r.startDate} ถึง ${r.endDate}`;
+
+    const statusClass = r.status === "CANCELLED"
+      ? "status-cancelled"
+      : "status-approved";
+
+    const cancelButton = r.status === "CANCELLED"
+      ? ""
+      : `
+        <button class="my-cancel-btn" onclick="openCancelRequest('${r.requestId}')">
+          ยกเลิกรายการ
+        </button>
+      `;
+
+    return `
+      <div class="my-request-card">
+        <div class="my-request-main">
+          <div class="my-request-title">${title}</div>
+          <div class="my-request-sub">${dateText} • ${r.startTime || "-"}-${r.endTime || "-"}</div>
+          <div class="my-request-reason">${r.reason || r.detail || "-"}</div>
+          <div class="my-request-status ${statusClass}">
+            ${r.status === "CANCELLED" ? "ยกเลิกแล้ว" : "อนุมัติแล้ว"}
+            ${r.hrConfirmed ? " • ยืนยัน HR แล้ว" : " • รอยืนยัน HR"}
+          </div>
+        </div>
+
+        <div class="my-request-actions">
+          <button class="my-detail-btn" onclick='openMyRequestDetail(${JSON.stringify(r)})'>
+            ดูรายละเอียด
+          </button>
+          ${cancelButton}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function getRequestTitleClient(r) {
+  if (r.requestType === "LEAVE") {
+    return getLeaveTypeLabelClient(r.leaveType);
+  }
+
+  if (r.requestType === "NO_DUTY") {
+    return "ไม่รับเวร";
+  }
+
+  if (r.requestType === "MEETING") {
+    return "ประชุม";
+  }
+
+  return "อื่น ๆ";
+}
+
+function openMyRequestDetail(r) {
+  const dateText = r.startDate === r.endDate
+    ? r.startDate
+    : `${r.startDate} ถึง ${r.endDate}`;
+
+  const html = `
+    <div class="event-detail-card">
+      <div class="event-detail-type">${getRequestTitleClient(r)}</div>
+      <div class="event-detail-title">${dateText}</div>
+      <div class="event-detail-line">เวลา: ${r.startTime || "-"}-${r.endTime || "-"}</div>
+      <div class="event-detail-line">จำนวนวัน: ${r.dayCount || "-"}</div>
+      <div class="event-detail-line">เหตุผล/รายละเอียด: ${r.reason || r.detail || "-"}</div>
+      <div class="event-detail-line">สถานะ: ${r.status === "CANCELLED" ? "ยกเลิกแล้ว" : "อนุมัติแล้ว"}</div>
+      <div class="event-detail-line">HR-iService: ${r.hrConfirmed ? "ยืนยันแล้ว" : "รอยืนยัน"}</div>
+    </div>
+  `;
+
+  showModalHtml("รายละเอียดรายการ", html, "📌");
+}
+
+function openCancelRequest(requestId) {
+  const html = `
+    <div class="event-detail-card">
+      <div class="event-detail-title">ยืนยันการยกเลิกรายการ</div>
+      <div class="event-detail-line mb-3">
+        กรุณาระบุเหตุผลการยกเลิก เพื่อเก็บไว้ตรวจสอบย้อนหลัง
+      </div>
+      <textarea id="cancelReasonInput" class="form-control" rows="3" placeholder="เหตุผลการยกเลิก"></textarea>
+      <button class="my-cancel-confirm-btn mt-3" onclick="cancelMyRequest('${requestId}')">
+        ยืนยันยกเลิก
+      </button>
+    </div>
+  `;
+
+  showModalHtml("ยกเลิกรายการ", html, "⚠️");
+}
+
+async function cancelMyRequest(requestId) {
+  const reason = document.getElementById("cancelReasonInput").value.trim();
+
+  if (!reason) {
+    showModal("กรอกข้อมูลไม่ครบ", "กรุณาระบุเหตุผลการยกเลิก", "📝");
+    return;
+  }
+
+  const url =
+    `${WEB_APP_URL}?action=cancelRequest` +
+    `&requestId=${encodeURIComponent(requestId)}` +
+    `&cancelledBy=${encodeURIComponent(currentUser.userId)}` +
+    `&cancelReason=${encodeURIComponent(reason)}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (!data.ok) {
+    showModal("ยกเลิกไม่สำเร็จ", data.message || "กรุณาลองใหม่", "⚠️");
+    return;
+  }
+
+  showModal("สำเร็จ", "ยกเลิกรายการเรียบร้อยแล้ว", "✅");
+
+  loadDashboard();
+  showMyRequestsPage();
 }
     
   </script>
