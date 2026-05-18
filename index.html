@@ -1468,7 +1468,7 @@ function getLeaveTypeLabelClient(type) {
 });
 
     function showRequestPage() {
-  document.getElementById("dashboardPage").style.display = "none";
+  hideAllPages();
 
   const page = document.getElementById("requestPage");
   page.style.display = "block";
@@ -1642,8 +1642,7 @@ async function submitRequestFromForm() {
 }
 
 function showDashboardPage() {
-  document.getElementById("requestPage").style.display = "none";
-  document.getElementById("hrConfirmPage").style.display = "none";
+  hideAllPages();
   document.getElementById("dashboardPage").style.display = "block";
 }
 
@@ -1652,8 +1651,7 @@ function getDisplayName(person) {
 }
 
 async function showHrConfirmPage() {
-  document.getElementById("dashboardPage").style.display = "none";
-  document.getElementById("requestPage").style.display = "none";
+  hideAllPages();
 
   const page = document.getElementById("hrConfirmPage");
   page.style.display = "block";
@@ -1730,6 +1728,12 @@ async function confirmHr(requestId) {
 
   showModal("สำเร็จ", "ยืนยันลาใน HR-iService แล้ว", "✅");
   showHrConfirmPage();
+}
+
+function hideAllPages() {
+  document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("requestPage").style.display = "none";
+  document.getElementById("hrConfirmPage").style.display = "none";
 }
     
   </script>
